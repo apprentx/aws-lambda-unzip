@@ -18,8 +18,10 @@ def lambda_handler(event, context):
     key = event['s3']['object']['key']
     path = os.path.dirname(key)
 
-    if not "eLearning" in path: 
+    if not "eLearning" in path:
         return
+
+    file_name_without_extension = key[(key.index('/eLearning/')+11):len(key)-4]
 
     # Create temporary file
     temp_file = tempfile.mktemp()
@@ -31,7 +33,7 @@ def lambda_handler(event, context):
     # Call action method with using ThreadPool
     with futures.ThreadPoolExecutor(max_workers=4) as executor:
         future_list = [
-            executor.submit(extract, filename)
+            executor.submit(extract, filename, file_name_without_extension)
             for filename in zipdata.namelist()
         ]
 
@@ -46,13 +48,13 @@ def lambda_handler(event, context):
     return result
 
 
-def extract(filename):
+def extract(filename, file_name_without_extension):
     upload_status = 'success'
     try:
         s3.upload_fileobj(
             BytesIO(zipdata.read(filename)),
             bucket,
-            os.path.join(path, filename)
+            os.path.join(path, file_name_without_extension+"/"+filename)
         )
     except Exception:
         upload_status = 'fail'
