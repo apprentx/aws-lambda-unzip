@@ -18,6 +18,9 @@ def lambda_handler(event, context):
     key = event['s3']['object']['key']
     path = os.path.dirname(key)
 
+    if not "eLearning" in path: 
+        return
+
     # Create temporary file
     temp_file = tempfile.mktemp()
 

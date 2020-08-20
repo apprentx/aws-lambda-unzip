@@ -1,1 +1,1 @@
-target_bucket = "target_bucket"
+target_bucket = "b12-organization-image"
